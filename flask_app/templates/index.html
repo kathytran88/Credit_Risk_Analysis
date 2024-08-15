@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credit Risk Prediction</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -140,9 +139,18 @@
                 },
                 body: JSON.stringify(data),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(result => {
-                document.getElementById('result').textContent = `Prediction: ${result.prediction}`;
+                if (result.prediction !== undefined) {
+                    document.getElementById('result').textContent = `Prediction: ${result.prediction}`;
+                } else {
+                    document.getElementById('result').textContent = 'Prediction: Undefined';
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
