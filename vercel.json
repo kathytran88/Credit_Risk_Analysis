@@ -11,5 +11,10 @@
       "src": "/(.*)",
       "dest": "flask_app/app.py"
     }
-  ]
+  ],
+  "functions": {
+    "api/*.js": {
+      "excludeFiles": "**/*.model"
+    }
+  }
 }
