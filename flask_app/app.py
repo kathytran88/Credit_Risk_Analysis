@@ -1,111 +1,47 @@
-from flask import Flask, request, jsonify
-from models.knn_model import predict_knn
-from models.decision_tree_model import predict_decision_tree
-from models.random_forest_model import predict_random_forest
+from flask import Flask, render_template, request
+import pickle
+import numpy as np
 
 app = Flask(__name__)
 
-# Route to predict using KNN model
-@app.route('/predict_knn', methods=['POST'])
-def predict_knn_route():
-    try:
-        data = request.get_json()
-        # Extract values from the request
-        checking_status = data['CheckingStatus']
-        credit_history = data['CreditHistory']
-        existing_savings = data['ExistingSavings']
-        housing = data['Housing']
-        job = data['Job']
-        loan_duration = float(data['LoanDuration'])
-        loan_amount = float(data['LoanAmount'])
-        age = float(data['Age'])
+# Load models
+with open('decision_tree_model.pkl', 'rb') as file:
+    decision_tree_model = pickle.load(file)
 
-        # Prepare the input data as expected by the model
-        input_data = [
-            checking_status,
-            credit_history,
-            existing_savings,
-            housing,
-            job,
-            loan_duration,
-            loan_amount,
-            age
-        ]
-        
-        # Make prediction
-        prediction = predict_knn(input_data)
-        result = 'Risk' if prediction == 1 else 'No Risk'
-        return jsonify({'prediction': result})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+with open('knn_model.pkl', 'rb') as file:
+    knn_model = pickle.load(file)
 
-# Route to predict using Decision Tree model
-@app.route('/predict_decision_tree', methods=['POST'])
-def predict_decision_tree_route():
-    try:
-        data = request.get_json()
-        # Extract values from the request
-        checking_status = data['CheckingStatus']
-        credit_history = data['CreditHistory']
-        existing_savings = data['ExistingSavings']
-        housing = data['Housing']
-        job = data['Job']
-        loan_duration = float(data['LoanDuration'])
-        loan_amount = float(data['LoanAmount'])
-        age = float(data['Age'])
+with open('random_forest_model.pkl', 'rb') as file:
+    random_forest_model = pickle.load(file)
 
-        # Prepare the input data as expected by the model
-        input_data = [
-            checking_status,
-            credit_history,
-            existing_savings,
-            housing,
-            job,
-            loan_duration,
-            loan_amount,
-            age
-        ]
-        
-        # Make prediction
-        prediction = predict_decision_tree(input_data)
-        result = 'Risk' if prediction == 1 else 'No Risk'
-        return jsonify({'prediction': result})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    prediction_text = None
+    if request.method == 'POST':
+        # Retrieve form data
+        loan_duration = float(request.form['loan_duration'])
+        loan_amount = float(request.form['loan_amount'])
+        installment_percent = float(request.form['installment_percent'])
+        age = float(request.form['age'])
+        existing_credits_count = float(request.form['existing_credits_count'])
+        model_type = request.form['model_type']
 
-# Route to predict using Random Forest model
-@app.route('/predict_random_forest', methods=['POST'])
-def predict_random_forest_route():
-    try:
-        data = request.get_json()
-        # Extract values from the request
-        checking_status = data['CheckingStatus']
-        credit_history = data['CreditHistory']
-        existing_savings = data['ExistingSavings']
-        housing = data['Housing']
-        job = data['Job']
-        loan_duration = float(data['LoanDuration'])
-        loan_amount = float(data['LoanAmount'])
-        age = float(data['Age'])
+        # Combine input data into a numpy array
+        input_data = np.array([[loan_duration, loan_amount, installment_percent, age, existing_credits_count]])
 
-        # Prepare the input data as expected by the model
-        input_data = [
-            checking_status,
-            credit_history,
-            existing_savings,
-            housing,
-            job,
-            loan_duration,
-            loan_amount,
-            age
-        ]
-        
-        # Make prediction
-        prediction = predict_random_forest(input_data)
-        result = 'Risk' if prediction == 1 else 'No Risk'
-        return jsonify({'prediction': result})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        # Select and apply the chosen model
+        if model_type == 'decision_tree':
+            prediction = decision_tree_model.predict(input_data)
+        elif model_type == 'knn':
+            prediction = knn_model.predict(input_data)
+        elif model_type == 'random_forest':
+            prediction = random_forest_model.predict(input_data)
+
+        # Convert prediction to readable text
+        prediction_text = 'Risk' if prediction[0] == 1 else 'No Risk'
+
+    return render_template('index.html', prediction_text=prediction_text)
 
 if __name__ == '__main__':
     app.run(debug=True)
+

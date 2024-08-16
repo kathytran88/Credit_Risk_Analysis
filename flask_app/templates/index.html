@@ -4,151 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credit Risk Prediction</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
         }
-        h1 {
+        h2 {
+            color: #333;
             text-align: center;
         }
         form {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
+            background-color: #fff;
+            padding: 40px;
+            padding-right: 50px;
+            border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 20px auto;
         }
-        input, select {
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="number"],
+        select {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
-        button {
-            padding: 10px 20px;
-            background: #007BFF;
+        input[type="submit"] {
+            background-color: #007BFF;
             color: white;
+            padding: 10px 15px;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
             width: 100%;
-            margin: 5px 0;
         }
-        button:hover {
-            background: #0056b3;
+        input[type="submit"]:hover {
+            background-color: #0056b3;
         }
-        .result {
-            margin-top: 20px;
-            font-size: 1.2em;
+        h3 {
             text-align: center;
-        }
-        @media (max-width: 600px) {
-            form {
-                width: 100%;
-                padding: 10px;
-            }
-            button {
-                font-size: 0.9em;
-            }
+            color: #333;
         }
     </style>
 </head>
 <body>
-    <h1>Credit Risk Prediction</h1>
-    <form id="predictionForm">
-        <label for="CheckingStatus">Checking Status</label>
-        <select id="CheckingStatus" name="CheckingStatus" required>
-            <option value="no_checking">No Checking</option>
-            <option value="less_0">Less than 0</option>
-            <option value="0_to_200">0 to 200</option>
-            <option value="greater_200">Greater than 200</option>
-        </select>
+    <h2>Credit Risk Prediction</h2>
+    <form action="/" method="post">
+        <label for="loan_duration">Loan Duration:</label>
+        <input type="number" step="any" name="loan_duration" id="loan_duration" required><br><br>
 
-        <label for="CreditHistory">Credit History</label>
-        <select id="CreditHistory" name="CreditHistory" required>
-            <option value="prior_payments_delayed">Prior Payments Delayed</option>
-            <option value="credits_paid_to_date">Credits Paid to Date</option>
-            <option value="outstanding_credit">Outstanding Credit</option>
-            <option value="all_credits_paid_back">All Credits Paid Back</option>
-            <option value="no_credits">No Credits</option>
-        </select>
+        <label for="loan_amount">Loan Amount:</label>
+        <input type="number" step="any" name="loan_amount" id="loan_amount" required><br><br>
 
-        <label for="ExistingSavings">Existing Savings</label>
-        <select id="ExistingSavings" name="ExistingSavings" required>
-            <option value="less_100">Less than 100</option>
-            <option value="100_to_500">100 to 500</option>
-            <option value="500_to_1000">500 to 1000</option>
-            <option value="greater_1000">Greater than 1000</option>
-            <option value="unknown">Unknown</option>
-        </select>
+        <label for="installment_percent">Installment Percent:</label>
+        <input type="number" step="any" name="installment_percent" id="installment_percent" required><br><br>
 
-        <label for="Housing">Housing</label>
-        <select id="Housing" name="Housing" required>
-            <option value="own">Own</option>
-            <option value="rent">Rent</option>
-            <option value="free">Free</option>
-        </select>
+        <label for="age">Age:</label>
+        <input type="number" step="any" name="age" id="age" required><br><br>
 
-        <label for="Job">Job</label>
-        <select id="Job" name="Job" required>
-            <option value="skilled">Skilled</option>
-            <option value="unskilled">Unskilled</option>
-            <option value="management_self-employed">Management/Self-employed</option>
-            <option value="unemployed">Unemployed</option>
-        </select>
+        <label for="existing_credits_count">Existing Credits Count:</label>
+        <input type="number" step="any" name="existing_credits_count" id="existing_credits_count" required><br><br>
 
-        <label for="LoanDuration">Loan Duration (4 - 64 months)</label>
-        <input type="number" id="LoanDuration" name="LoanDuration" min="4" max="64" required>
+        <label for="model_type">Choose a model:</label>
+        <select name="model_type" id="model_type">
+            <option value="decision_tree">Decision Tree</option>
+            <option value="knn">K Nearest Neighbors</option>
+            <option value="random_forest">Random Forest</option>
+        </select><br><br>
 
-        <label for="LoanAmount">Loan Amount (250 - 11676)</label>
-        <input type="number" id="LoanAmount" name="LoanAmount" min="250" max="11676" required>
-
-        <label for="Age">Age (19 - 74)</label>
-        <input type="number" id="Age" name="Age" min="19" max="74" required>
-
-        <button type="button" onclick="makePrediction('knn')">Predict with KNN</button>
-        <button type="button" onclick="makePrediction('decision_tree')">Predict with Decision Tree</button>
-        <button type="button" onclick="makePrediction('random_forest')">Predict with Random Forest</button>
+        <input type="submit" value="Predict">
     </form>
 
-    <div class="result" id="result"></div>
-
-    <script>
-        function getFormData() {
-            const form = document.getElementById('predictionForm');
-            const formData = new FormData(form);
-            const data = {};
-
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-
-            return data;
-        }
-
-        function makePrediction(model) {
-            const data = getFormData();
-            const url = `/predict_${model}`;
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(result => {
-                document.getElementById('result').textContent = `Prediction: ${result.prediction}`;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('result').textContent = 'Error occurred';
-            });
-        }
-    </script>
+    {% if prediction_text %}
+    <h3>{{ prediction_text }}</h3>
+    {% endif %}
 </body>
 </html>
+
