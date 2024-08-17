@@ -1,4 +1,4 @@
-# Fully hosted on AWS EC2: (Try live server)[http://ec2-3-141-97-195.us-east-2.compute.amazonaws.com:8080/]
+# Fully hosted on AWS EC2: [Try live server](http://ec2-3-141-97-195.us-east-2.compute.amazonaws.com:8080/)
 
 # Credit_Risk_Analysis
 
