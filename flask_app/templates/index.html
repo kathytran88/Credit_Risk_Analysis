@@ -6,21 +6,29 @@
     <title>Credit Risk Prediction</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: sans-serif;
+            background-color: #ffffff;
             margin: 0;
             padding: 20px;
         }
-        h2 {
-            color: #333;
+        h1 {
+            color: #8b6468;
             text-align: center;
         }
+
+        a {
+            text-decoration: underline;
+            color: #c17d2f;
+        }
+        a:hover {
+            color: #ff8b25;
+        }
         form {
-            background-color: #fff;
+            background-color: #8b6468;
             padding: 40px;
             padding-right: 50px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(196, 113, 232, 0.1);
             max-width: 400px;
             margin: 20px auto;
         }
@@ -38,7 +46,7 @@
             border-radius: 4px;
         }
         input[type="submit"] {
-            background-color: #007BFF;
+            background-color: #c17d2f;
             color: white;
             padding: 10px 15px;
             border: none;
@@ -47,17 +55,22 @@
             width: 100%;
         }
         input[type="submit"]:hover {
-            background-color: #0056b3;
+            background-color: #c51159;
         }
-        h3 {
+        h3, h1, h2, h4 {
+            font-family: sans-serif;
             text-align: center;
-            color: #333;
+        }
+        label {
+            color: white;
         }
     </style>
 </head>
 <body>
-    <h2>Credit Risk Prediction - Kathy Tran's project</h2>
-    <h3>Output: Risk or No Risk</h3>
+    <h1>Credit Risk Prediction - Kathy Tran's project</h1>
+    <h3>View code: <a href="https://github.com/kathytran88/Credit_Risk_Analysis">https://github.com/kathytran88/Credit_Risk_Analysis</a></h3>
+    <h4><b>Project description: </b>Built 3 machine learning models to predict whether a loan made by a customer to a bank is risky or not</h4>
+    <h4>Output: Risk or No Risk</h4>
     <form action="/" method="post">
         <label for="loan_duration">Loan Duration (in months):</label>
         <input type="number" step="any" name="loan_duration" id="loan_duration" required><br><br>
@@ -69,7 +82,8 @@
         <input type="number" step="any" name="installment_percent" id="installment_percent" required><br><br>
 
         <label for="age">Age:</label>
-        <input type="number" step="any" name="age" id="age" required><br><br>
+        <input type="number" step="any" name="age" id="age" min="18" max="100" required><br><br>
+        <span id="ageError" style="color: red; display: none;">Please enter an age between 18 and 100.</span>
 
         <label for="existing_credits_count">Existing Credits Count (usually 1-3):</label>
         <input type="number" step="any" name="existing_credits_count" id="existing_credits_count" required><br><br>
@@ -87,6 +101,21 @@
     {% if prediction_text %}
     <h3>{{ prediction_text }}</h3>
     {% endif %}
+
+
+<script>
+    document.getElementById("myForm").addEventListener("submit", function(event) {
+      var ageInput = document.getElementById("age");
+      var ageError = document.getElementById("ageError");
+  
+      if (ageInput.value < 18 || ageInput.value > 100) {
+        ageError.style.display = "inline";
+        event.preventDefault(); // Prevent form submission
+      } else {
+        ageError.style.display = "none";
+      }
+    });
+  </script>
 </body>
 </html>
 
